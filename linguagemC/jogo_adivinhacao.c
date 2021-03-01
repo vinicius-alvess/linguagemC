@@ -21,7 +21,7 @@ int main()
 
     int chute;
     int numerodetentativas = 5;
-    int tentativas = 1;
+    int chutes_dados = 1;
     double pontos = 1000;
 
     int acertou = 0;
@@ -51,7 +51,7 @@ int main()
     for (int i = 1; i <= numerodetentativas; i++)
     {
 
-        printf("Tentativa %d\n", tentativas);
+        printf("Tentativa %d\n", chutes_dados);
         printf("Qual e o seu chute? ");
 
         scanf("%d", &chute);
@@ -81,7 +81,7 @@ int main()
             printf("Seu chute foi menor que o numero secreto\n");
         }
 
-        tentativas++;
+        chutes_dados++;
 
         double pontosperdidos = abs(chute - numerosecreto) / (double)2;
         pontos = pontos - pontosperdidos;
@@ -92,7 +92,7 @@ int main()
     if (acertou)
     {
         printf("Voce ganhou!\n");
-        printf("Voce acertou em %d tentativas!\n", tentativas);
+        printf("Voce acertou em %d tentativas!\n", chutes_dados);
         printf("Total de pontos: %.1f\n", pontos);
     }
     else
