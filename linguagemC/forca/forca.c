@@ -17,7 +17,6 @@ void abertura()
 
 int letra_existe(char letra)
 {
-
     for (int j = 0; j < strlen(palavrasecreta); j++)
     {
         if (letra == palavrasecreta[j])
@@ -25,7 +24,6 @@ int letra_existe(char letra)
             return 1;
         }
     }
-
     return 0;
 }
 
@@ -41,7 +39,6 @@ int chutes_errados()
             erros++;
         }
     }
-
     return erros;
 }
 
@@ -59,7 +56,6 @@ int ganhou()
             return 0;
         }
     }
-
     return 1;
 }
 
@@ -77,7 +73,6 @@ void chuta()
     {
         printf("\nVoce errou: a palavra NAO tem a letra %c\n\n", chute);
     }
-
     chutes[chutesdados] = chute;
     chutesdados++;
 }
@@ -93,13 +88,11 @@ int jachutou(char letra)
             break;
         }
     }
-
     return achou;
 }
 
 void desenha_forca()
 {
-
     int erros = chutes_errados();
 
     printf("  _______       \n");
@@ -148,7 +141,6 @@ void escolhe_palavra()
     {
         fscanf(f, "%s", palavrasecreta);
     }
-
     fclose(f);
 }
 
