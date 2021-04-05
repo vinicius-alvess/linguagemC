@@ -1,118 +1,94 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 #include "fogefoge.h"
-#include "mapa.h"
+#include "mapa.c"
 
 MAPA m;
 POSICAO heroi;
+int tempilula = 0;
 
-//////////////*arquivo mapa.c*////////////////
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <string.h>
-// #include "mapa.h"
-
-void copiamapa(MAPA *destino, MAPA *origem)
+int acabou()
 {
-	destino->linhas = origem->linhas;
-	destino->colunas = origem->colunas;
+	POSICAO pos;
 
-	alocamapa(destino);
+	int perdeu = !encontramapa(&m, &pos, HEROI);
+	int ganhou = !encontramapa(&m, &pos, FANTASMA);
 
-	for (int i = 0; i < origem->linhas; i++)
-	{
-		strcpy(destino->matriz[i], origem->matriz[i]);
-	}
+	return ganhou || perdeu;
 }
 
-void lemapa(MAPA *m)
+int ehdirecao(char direcao)
 {
-	FILE *f;
-	f = fopen("mapa.txt", "r");
-	if (f == 0)
-	{
-		printf("Erro na leitura do mapa");
-		exit(1);
-	}
-
-	fscanf(f, "%d %d", &(m->linhas), &(m->colunas));
-	alocamapa(m);
-
-	for (int i = 0; i < m->linhas; i++)
-	{
-		fscanf(f, "%s", m->matriz[i]);
-	}
-
-	fclose(f);
+	return direcao == ESQUERDA ||
+		   direcao == CIMA ||
+		   direcao == BAIXO ||
+		   direcao == DIREITA;
 }
 
-void alocamapa(MAPA *m)
+void move(char direcao)
 {
-	m->matriz = malloc(sizeof(char *) * m->linhas);
 
-	for (int i = 0; i < m->linhas; i++)
+	if (!ehdirecao(direcao))
+		return;
+
+	int proximox = heroi.x;
+	int proximoy = heroi.y;
+
+	switch (direcao)
 	{
-		m->matriz[i] = malloc(sizeof(char) * m->colunas + 1);
+	case ESQUERDA:
+		proximoy--;
+		break;
+	case CIMA:
+		proximox--;
+		break;
+	case BAIXO:
+		proximox++;
+		break;
+	case DIREITA:
+		proximoy++;
+		break;
 	}
+
+	if (!podeandar(&m, HEROI, proximox, proximoy))
+		return;
+
+	if (ehpersonagem(&m, PILULA, proximox, proximoy))
+	{
+		tempilula = 1;
+	}
+
+	andanomapa(&m, heroi.x, heroi.y, proximox, proximoy);
+	heroi.x = proximox;
+	heroi.y = proximoy;
 }
 
-void liberamapa(MAPA *m)
-{
-	for (int i = 0; i < m->linhas; i++)
-	{
-		free(m->matriz[i]);
-	}
-
-	free(m->matriz);
-}
-
-void imprimemapa(MAPA *m)
-{
-	for (int i = 0; i < m->linhas; i++)
-	{
-		printf("%s\n", m->matriz[i]);
-	}
-}
-
-void encontramapa(MAPA *m, POSICAO *p, char c)
+int praondefantasmavai(int xatual, int yatual,
+					   int *xdestino, int *ydestino)
 {
 
-	for (int i = 0; i < m->linhas; i++)
+	int opcoes[4][2] = {
+		{xatual, yatual + 1},
+		{xatual + 1, yatual},
+		{xatual, yatual - 1},
+		{xatual - 1, yatual}};
+
+	srand(time(0));
+	for (int i = 0; i < 10; i++)
 	{
-		for (int j = 0; j < m->colunas; j++)
+		int posicao = rand() % 4;
+
+		if (podeandar(&m, FANTASMA, opcoes[posicao][0], opcoes[posicao][1]))
 		{
-			if (m->matriz[i][j] == c)
-			{
-				p->x = i;
-				p->y = j;
-				return;
-			}
+			*xdestino = opcoes[posicao][0];
+			*ydestino = opcoes[posicao][1];
+			return 1;
 		}
 	}
+
+	return 0;
 }
-
-void andanomapa(MAPA *m, int xorigem, int yorigem, int xdestino, int ydestino)
-{
-	char personagem = m->matriz[xorigem][yorigem];
-
-	m->matriz[xdestino][ydestino] = personagem;
-	m->matriz[xorigem][yorigem] = VAZIO;
-}
-
-int ehvalida(MAPA *m, int proximox, int proximoy)
-{
-	return proximox < m->linhas && proximoy < m->colunas;
-}
-
-int ehvazia(MAPA *m, int proximox, int proximoy)
-{
-	return m->matriz[proximox][proximoy] == VAZIO;
-}
-//////*FIM do arquivo mapa.c*/////
-
-//////////////*arquivo fogefoge.c*////////////////
 
 void fantasmas()
 {
@@ -143,93 +119,41 @@ void fantasmas()
 	liberamapa(&copia);
 }
 
-int praondefantasmavai(int xatual, int yatual,
-					   int *xdestino, int *ydestino)
+void explodepilula(int x, int y, int qtd)
 {
 
-	int opcoes[4][2] = {
-		{xatual, yatual + 1},
-		{xatual + 1, yatual},
-		{xatual, yatual - 1},
-		{xatual - 1, yatual}};
-
-	srand(time(0));
-	for (int i = 0; i < 10; i++)
-	{
-		int posicao = rand() % 4;
-
-		if (ehvalida(&m, opcoes[posicao][0], opcoes[posicao][1]) &&
-			ehvazia(&m, opcoes[posicao][0], opcoes[posicao][1]))
-		{
-			*xdestino = opcoes[posicao][0];
-			*ydestino = opcoes[posicao][1];
-			return 1;
-		}
-	}
-
-	return 0;
-}
-
-int acabou()
-{
-	return 0;
-}
-
-int ehdirecao(char direcao)
-{
-	return direcao == ESQUERDA || direcao == CIMA || direcao == BAIXO || direcao == DIREITA;
-}
-
-void move(char direcao)
-{
-	if (!ehdirecao(direcao))
+	if (qtd == 0)
+		return;
+	if (!ehvalida(&m, x, y + 1))
+		return;
+	if (ehparede(&m, x, y + 1))
 		return;
 
-	int proximox = heroi.x;
-	int proximoy = heroi.y;
+	m.matriz[x][y + 1] = VAZIO;
 
-	switch (direcao)
-	{
-	case ESQUERDA:
-		proximoy--;
-		break;
-	case CIMA:
-		proximox--;
-		break;
-	case BAIXO:
-		proximox++;
-		break;
-	case DIREITA:
-		proximoy++;
-		break;
-	}
-
-	if (!ehvalida(&m, proximox, proximoy))
-		return;
-
-	if (!ehvazia(&m, proximox, proximoy))
-		return;
-
-	andanomapa(&m, heroi.x, heroi.y, proximox, proximoy);
-	heroi.x = proximox;
-	heroi.y = proximoy;
+	explodepilula(x, y + 1, qtd - 1);
 }
-
-/////*FIM do arquivo fogefoge.c*/////
 
 int main()
 {
+
 	lemapa(&m);
 	encontramapa(&m, &heroi, HEROI);
 
 	do
 	{
+		printf("Tem pipula: %s\n", (tempilula ? "SIM" : "NAO"));
 		imprimemapa(&m);
 
 		char comando;
 		scanf(" %c", &comando);
 
 		move(comando);
+		if (comando == BOMBA)
+		{
+			explodepilula(heroi.x, heroi.y, 3);
+		}
+
 		fantasmas();
 
 	} while (!acabou());
