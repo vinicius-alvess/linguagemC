@@ -3,6 +3,7 @@
 #include <time.h>
 #include "fogefoge.h"
 #include "mapa.c"
+#include "ui.c"
 
 MAPA m;
 POSICAO heroi;
@@ -28,9 +29,6 @@ int ehdirecao(char direcao)
 
 void move(char direcao)
 {
-
-	if (!ehdirecao(direcao))
-		return;
 
 	int proximox = heroi.x;
 	int proximoy = heroi.y;
@@ -119,14 +117,6 @@ void fantasmas()
 	liberamapa(&copia);
 }
 
-void explodepilula()
-{
-	explodepilula2(heroi.x, heroi.y, 0, 1, 3);
-	explodepilula2(heroi.x, heroi.y, 0, -1, 3);
-	explodepilula2(heroi.x, heroi.y, 1, 0, 3);
-	explodepilula2(heroi.x, heroi.y, -1, 0, 3);
-}
-
 void explodepilula2(int x, int y, int somax, int somay, int qtd)
 {
 
@@ -145,6 +135,19 @@ void explodepilula2(int x, int y, int somax, int somay, int qtd)
 	explodepilula2(novox, novoy, somax, somay, qtd - 1);
 }
 
+void explodepilula()
+{
+	if (!tempilula)
+		return;
+
+	explodepilula2(heroi.x, heroi.y, 0, 1, 3);
+	explodepilula2(heroi.x, heroi.y, 0, -1, 3);
+	explodepilula2(heroi.x, heroi.y, 1, 0, 3);
+	explodepilula2(heroi.x, heroi.y, -1, 0, 3);
+
+	tempilula = 0;
+}
+
 int main()
 {
 
@@ -153,17 +156,16 @@ int main()
 
 	do
 	{
-		printf("Tem pipula: %s\n", (tempilula ? "SIM" : "NAO"));
+		printf("Pílula: %s\n", (tempilula ? "SIM" : "NÃO"));
 		imprimemapa(&m);
 
 		char comando;
 		scanf(" %c", &comando);
 
-		move(comando);
+		if (ehdirecao(comando))
+			move(comando);
 		if (comando == BOMBA)
-		{
 			explodepilula();
-		}
 
 		fantasmas();
 
