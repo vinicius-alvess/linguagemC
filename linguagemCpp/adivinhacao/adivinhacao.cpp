@@ -11,7 +11,7 @@ void escolhe_nivel();
 int sorteia_numero();
 void calcula_pontos(int chute);
 void adivinha();
-void parabens_acertou(int tentativas);
+void ganhou(int tentativas);
 void perdeu();
 
 // Variaveis Globais
@@ -100,7 +100,7 @@ void adivinha()
 
         if (acertou)
         {
-            parabens_acertou(tentativas);
+            ganhou(tentativas);
             acertou = true;
             break;
         }
@@ -120,7 +120,7 @@ void adivinha()
     }
 }
 
-void parabens_acertou(int tentativas)
+void ganhou(int tentativas)
 {
     cout << "Parabens, voce ganhou!" << endl;
     cout << "Voce acertou em " << tentativas << " tentativas!" << endl;
