@@ -28,7 +28,7 @@ void abertura()
 
 void escolhe_nivel()
 {
-    cout << "Escolha o seu ní­vel de dificuldade:" << endl;
+    cout << "Escolha o seu nível de dificuldade:" << endl;
     cout << "Fácil (F), Médio (M) ou Difícil (D)" << endl;
 
     char nivel;
@@ -56,7 +56,7 @@ void escolhe_nivel()
 
         default:
             caracter_invalido = true;
-            cout << "Caracter Invalido!" << endl;
+            cout << "Caracter Inválido!" << endl;
             break;
         }
     } while (caracter_invalido);
@@ -95,13 +95,12 @@ void adivinha()
         calcula_pontos(chute);
 
         cout << "O valor do seu chute é: " << chute << endl;
-        bool acertou = chute == NUMERO_SECRETO;
+        acertou = chute == NUMERO_SECRETO;
         bool maior = chute > NUMERO_SECRETO;
 
         if (acertou)
         {
             ganhou(tentativas);
-            acertou = true;
             break;
         }
         else if (maior)
@@ -122,8 +121,8 @@ void adivinha()
 
 void ganhou(int tentativas)
 {
-    cout << "Parabens, voce ganhou!" << endl;
-    cout << "Voce acertou em " << tentativas << " tentativas!" << endl;
+    cout << "Parabéns, você ganhou!" << endl;
+    cout << "Você acertou em " << tentativas << " tentativas!" << endl;
 
     cout.precision(2);
     cout << fixed;
@@ -144,7 +143,7 @@ void ganhou(int tentativas)
 
 void perdeu()
 {
-    cout << "Voce perdeu!" << endl;
+    cout << "Você perdeu!" << endl;
     cout << "    _______________         " << endl;
     cout << "   /               \\       " << endl;
     cout << "  /                 \\      " << endl;
