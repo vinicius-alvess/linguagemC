@@ -3,6 +3,9 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <fstream> // manipular arquivos
+#include <ctime>
+#include <cstdlib>
 
 using namespace std;
 
@@ -14,9 +17,11 @@ bool enforcou();
 void imprime_chutes_errados();
 void imprime_letras_chutadas();
 void analisa_chute();
+vector<string> le_arquivo();
+void sorteia_palavra();
 
 // Variaveis Globais
-const string PALAVRA_SECRETA = "MELANCIA";
+string palavra_secreta;
 map<char, bool> chutou;
 vector<char> chutes_errados;
 
@@ -30,7 +35,7 @@ void abertura()
 
 bool letra_existe(char chute)
 {
-    for (char letra : PALAVRA_SECRETA)
+    for (char letra : palavra_secreta)
     {
         if (chute == letra)
         {
@@ -42,7 +47,7 @@ bool letra_existe(char chute)
 
 bool acertou()
 {
-    for (char letra : PALAVRA_SECRETA)
+    for (char letra : palavra_secreta)
     {
         if (!chutou[letra])
         {
@@ -69,7 +74,7 @@ void imprime_chutes_errados()
 
 void imprime_letras_chutadas()
 {
-    for (char letra : PALAVRA_SECRETA)
+    for (char letra : palavra_secreta)
     {
         if (chutou[letra])
         {
@@ -105,11 +110,63 @@ void analisa_chute()
     cout << endl;
 }
 
+vector<string> le_arquivo()
+{
+    ifstream arquivo;
+
+    arquivo.open("palavras.txt"); // abre arquivo
+
+    if (arquivo.is_open()) // se abrir
+    {
+
+        int quantidade_palavras;
+        arquivo >> quantidade_palavras;
+
+        if (quantidade_palavras == 0)
+        {
+            cout << "Não existe nenhuma palavra no banco de palavras!" << endl;
+            exit(0);
+        }
+
+        vector<string> palavras_do_arquivo;
+
+        for (int i = 0; i < quantidade_palavras; i++)
+        {
+            string palavra_lida;
+            arquivo >> palavra_lida;
+
+            palavras_do_arquivo.push_back(palavra_lida);
+        }
+
+        arquivo.close();
+        return palavras_do_arquivo;
+    }
+    else // caso nao abra
+    {
+        cout << "Não foi possível acessar o banco de palavras." << endl;
+        exit(0);
+    }
+}
+
+void sorteia_palavra()
+{
+    vector<string> palavras = le_arquivo();
+
+    srand(time(NULL));
+    int indice_sorteado = rand() % palavras.size();
+
+    palavra_secreta = palavras[indice_sorteado];
+}
+
 int main()
 {
     setlocale(LC_ALL, "Portuguese"); // Habilita a acentuacao para o portugues
 
     abertura();
+
+    le_arquivo();
+
+    sorteia_palavra();
 
     while (!acertou() && !enforcou())
     {
@@ -121,7 +178,7 @@ int main()
     }
 
     cout << "Fim de jogo!" << endl;
-    cout << "A palavra secreta era: " << PALAVRA_SECRETA << endl;
+    cout << "A palavra secreta era: " << palavra_secreta << endl;
 
     if (!acertou())
     {
