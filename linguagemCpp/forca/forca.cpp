@@ -19,6 +19,8 @@ void imprime_letras_chutadas();
 void analisa_chute();
 vector<string> le_arquivo();
 void sorteia_palavra();
+void adiciona_palavra();
+void salva_arquivo(vector<string> nova_lista);
 
 // Variaveis Globais
 string palavra_secreta;
@@ -112,7 +114,7 @@ void analisa_chute()
 
 vector<string> le_arquivo()
 {
-    ifstream arquivo;
+    ifstream arquivo; // para ler valores do arquivo
 
     arquivo.open("palavras.txt"); // abre arquivo
 
@@ -158,6 +160,42 @@ void sorteia_palavra()
     palavra_secreta = palavras[indice_sorteado];
 }
 
+void adiciona_palavra()
+{
+    cout << "Digite a nova palavra, usando letras maiúsculas." << endl;
+    string nova_palavra;
+    cin >> nova_palavra;
+
+    vector<string> lista_palavras = le_arquivo();
+
+    lista_palavras.push_back(nova_palavra);
+
+    salva_arquivo(lista_palavras);
+}
+
+void salva_arquivo(vector<string> nova_lista)
+{
+    ofstream arquivo; // escrita de valores em um arquivo
+
+    arquivo.open("palavras.txt");
+
+    if (arquivo.is_open())
+    {
+        arquivo << nova_lista.size() << endl;
+
+        for (string palavra : nova_lista)
+        {
+            arquivo << palavra << endl;
+        }
+        arquivo.close();
+    }
+    else
+    {
+        cout << "Não foi possível acessar o banco de palavras." << endl;
+        exit(0);
+    }
+}
+
 int main()
 {
     setlocale(LC_ALL, "Portuguese"); // Habilita a acentuacao para o portugues
@@ -187,5 +225,14 @@ int main()
     else
     {
         cout << "Você acertou a palavra secreta!" << endl;
+
+        cout << "Você deseja adicionar uma nova palalvra ao banco? (S/N): ";
+        char resposta;
+        cin >> resposta;
+
+        if (resposta == 'S')
+        {
+            adiciona_palavra();
+        }
     }
 }
