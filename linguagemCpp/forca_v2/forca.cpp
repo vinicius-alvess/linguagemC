@@ -4,6 +4,12 @@
 // g++ *.cpp -o forca.exe
 // & .\"forca.exe"
 
+// Como compilar varios arquivos separadamente
+// cd "c:\GitHub\linguagem_C\linguagemCpp\forca_v2"
+// g++ -c *.cpp
+// g++ *.o -o forca.exe
+// & .\"forca.exe"
+
 #include <iostream>
 #include <string>
 #include <map>
